@@ -1,14 +1,13 @@
 import LeaderForm from "@/components/leader-form";
 
 export const metadata = {
-    title: "Leader",
+  title: "Leader",
 }
 
 export default function LeaderPage() {
-
   return (
     <div>
-        <LeaderForm/>
+      <LeaderForm />
     </div>
   );
 }
