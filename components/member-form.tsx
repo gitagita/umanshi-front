@@ -3,8 +3,8 @@
 import { registerToSchedule } from "@/utils/member-register";
 import { FormEvent, useState } from "react";
 
-export default function MemberForm() {
-  const [calendarCode, setCalendarCode] = useState('');
+export default function MemberForm({ id }: { id: string }) {
+  const calendarCode = id;
   const [nickname, setNickname] = useState('');
 
   const handleSubmit = async (e: FormEvent) => {
@@ -26,20 +26,12 @@ export default function MemberForm() {
       <h1>팀원들과 일정조율을 시작합니다.</h1>
       <form onSubmit={handleSubmit}>
         <label>
-          그룹코드 입력
-          <input
-            type="text"
-            value={calendarCode}
-            onChange={(e) => setCalendarCode(e.target.value)}
-          />
-        </label>
-        <br />
-        <label>
           닉네임 설정
           <input
             type="text"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
+            required
           />
         </label>
         <br />
