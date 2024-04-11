@@ -1,1 +1,9 @@
-//리더 일정 설정 페이지
+import CalendarRange from "@/components/calendar-range";
+
+export default function CalendarRangePage() {
+  return (
+    <div>
+      <CalendarRange />
+    </div>
+  );
+}
