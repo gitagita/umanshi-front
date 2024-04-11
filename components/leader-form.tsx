@@ -31,6 +31,7 @@ export default function LeaderForm() {
             type="text"
             value={calendarName}
             onChange={(e) => setCalendarName(e.target.value)}
+            required
           />
         </label>
         <br />
@@ -40,6 +41,7 @@ export default function LeaderForm() {
             type="text"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
+            required
           />
         </label>
         <br />
