@@ -7,7 +7,8 @@ export const metadata = {
 
 export default function HomePage() {
   const userCookie = cookies().get("user");
-  const userInfo = JSON.parse(userCookie?.value || '');
+  let userInfo = {userId:'', calendarNm: '', nickname: ''};
+  if(userCookie) userInfo = JSON.parse(userCookie?.value || '');
   //console.log(userInfo);
 
   return (
@@ -22,7 +23,7 @@ export default function HomePage() {
         </li>
       </ul>
       {
-        userInfo != ''
+        userInfo.userId != ''
           ? <div><h3>이전에 참여한 캘린더가 있습니다</h3>
             <Link href={`/schedule/${userInfo.userId}`}>{userInfo.calendarNm}|{userInfo.nickname}</Link>
           </div>
