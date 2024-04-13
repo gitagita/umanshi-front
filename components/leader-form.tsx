@@ -2,20 +2,26 @@
 
 import { useState, FormEvent } from 'react';
 import { registerToCalendar } from '@/utils/calendar-register';
+import { useRouter } from 'next/navigation';
 
 export default function LeaderForm() {
   const [calendarName, setCalendarName] = useState('');
   const [nickname, setNickname] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
-      await registerToCalendar({ calendarName, nickname });
-      alert('Successfully registered to calendar!');
-      // Additional actions after successful registration
+      const result = await registerToCalendar({ calendarName, nickname });
+      alert(result.message);
+      
+      const calendarCode = result.data.calendarCode;
+      if(calendarCode) {
+        router.push(`leader/${calendarCode}`);
+      }
+      
     } catch (error) {
-      // Handle error, e.g., display error message
       console.error('Error registering to calendar:', error);
       alert('Failed to register to calendar. Please try again.');
     }
