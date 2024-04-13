@@ -8,6 +8,8 @@ import interactionPlugin from "@fullcalendar/interaction";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { setCalendarData } from '@/utils/calendar-register';
+import CalendarModal from "@/components/calendar-modal";
+import styles from "@/styles/calendar.module.css";
 
 let eventGuid: number = 0;
 
@@ -16,6 +18,7 @@ export default function CalendarRange({ id }: { id: string }) {
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
   const [calendarCode, setCalendarCode] = useState<string>(id);
+  const [visible, setVisible] = useState(false);
 
   const filterPassedTime = (time: Date) => {
     const currentDate = new Date(startTime);
@@ -89,8 +92,8 @@ export default function CalendarRange({ id }: { id: string }) {
 
     try {
       const result = await setCalendarData(calendarData, calendarCode);
+      setVisible(true);
       alert(result.message);
-      window.open("08_2_popup.html", "a", "width=400, height=300, left=100, top=50");
     } catch (error) {
       console.error('Error registering to calendar:', error);
       alert('Failed to register to calendar. Please try again.');
@@ -98,8 +101,8 @@ export default function CalendarRange({ id }: { id: string }) {
   }
 
   return (
-    <>
-      <div>
+    <div className={styles.calendarContainer}>
+      <div className={styles.datepicker}>
         <DatePicker
           selected={startTime}
           onChange={(date: Date) => setStartTime(date)}
@@ -120,18 +123,25 @@ export default function CalendarRange({ id }: { id: string }) {
           timeCaption="Time"
           dateFormat="h:mm aa"
         />
-      </div>
-      <button onClick={insertCalendarData}>결과 저장</button>
+        <button onClick={insertCalendarData}>결과 저장</button>
 
-      <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        events={events}
-        selectable={true}
-        eventClick={handleEventClick}
-        select={handleDateSelect}
-        selectAllow={handleSelectAllow}
-      />
-    </>
+        {visible ?
+          <CalendarModal id={calendarCode} />
+          : <></>
+        }
+      </div>
+
+      <div className={styles.calendarContainer}>
+        <FullCalendar
+          plugins={[dayGridPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
+          events={events}
+          selectable={true}
+          eventClick={handleEventClick}
+          select={handleDateSelect}
+          selectAllow={handleSelectAllow}
+        />
+      </div>
+    </div >
   );
 };
