@@ -5,11 +5,24 @@ import { EventInput, EventClickArg, DateSelectArg } from "@fullcalendar/core";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { setCalendarData } from '@/utils/calendar-register';
 
 let eventGuid: number = 0;
 
-export default function CalendarRange() {
+export default function CalendarRange({ id }: { id: string }) {
   const [events, setEvents] = useState<EventInput[]>([]);
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
+  const [calendarCode, setCalendarCode] = useState<string>(id);
+
+  const filterPassedTime = (time: Date) => {
+    const currentDate = new Date(startTime);
+    const selectedDate = new Date(time);
+
+    return currentDate.getTime() < selectedDate.getTime();
+  };
 
   const addEvents = (id: string, start: string, end: string) => {
     const newEvents: EventInput[] = [...events];
@@ -57,8 +70,59 @@ export default function CalendarRange() {
     return true;
   }
 
+  const setTimeFormat = (today: Date) => {
+    var hours = ('0' + today.getHours()).slice(-2);
+    var minutes = ('0' + today.getMinutes()).slice(-2);
+
+    return hours + ':' + minutes;
+  }
+
+  //캘린더 정보 저장 api 호출 함수
+  const insertCalendarData = async () => {
+    const calendarData = {
+      events: events,
+      times: {
+        start: setTimeFormat(startTime),
+        end: setTimeFormat(endTime)
+      }
+    }
+
+    try {
+      const result = await setCalendarData(calendarData, calendarCode);
+      alert(result.message);
+      window.open("08_2_popup.html", "a", "width=400, height=300, left=100, top=50");
+    } catch (error) {
+      console.error('Error registering to calendar:', error);
+      alert('Failed to register to calendar. Please try again.');
+    }
+  }
+
   return (
     <>
+      <div>
+        <DatePicker
+          selected={startTime}
+          onChange={(date: Date) => setStartTime(date)}
+          showTimeSelect
+          showTimeSelectOnly
+          timeIntervals={30}
+          timeCaption="Time"
+          dateFormat="h:mm aa"
+        />
+
+        <DatePicker
+          selected={endTime}
+          onChange={(date: Date) => setEndTime(date)}
+          showTimeSelect
+          showTimeSelectOnly
+          timeIntervals={30}
+          filterTime={filterPassedTime}
+          timeCaption="Time"
+          dateFormat="h:mm aa"
+        />
+      </div>
+      <button onClick={insertCalendarData}>결과 저장</button>
+
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"

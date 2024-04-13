@@ -1,9 +1,11 @@
 import CalendarRange from "@/components/calendar-range";
 
-export default function CalendarRangePage() {
+interface iParams { params: { id: string } }
+export default function CalendarRangePage({ params: { id } }: iParams) {
+
   return (
     <div>
-      <CalendarRange />
+      <CalendarRange id={id} />
     </div>
   );
 }
