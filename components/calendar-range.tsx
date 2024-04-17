@@ -11,6 +11,10 @@ import { setCalendarData } from '@/utils/calendar-data';
 import CalendarModal from "@/components/calendar-modal";
 import styles from "@/styles/calendar.module.css";
 
+interface SelectInfoParams {
+  start: Date, end: Date, startStr: string, endStr: string
+}
+
 let eventGuid: number = 0;
 
 export default function CalendarRange({ id }: { id: string }) {
@@ -54,7 +58,7 @@ export default function CalendarRange({ id }: { id: string }) {
     addEvents(eventId, selectInfo.startStr, selectInfo.endStr);
   }
 
-  const handleSelectAllow = (selectInfo: any) => {
+  const handleSelectAllow = (selectInfo: SelectInfoParams) => {
     //지난 날 제외
     var now = new Date();
     var yesterday = new Date(now.setDate(now.getDate() - 1));
