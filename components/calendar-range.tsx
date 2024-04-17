@@ -7,7 +7,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { setCalendarData } from '@/utils/calendar-register';
+import { setCalendarData } from '@/utils/calendar-data';
 import CalendarModal from "@/components/calendar-modal";
 import styles from "@/styles/calendar.module.css";
 
