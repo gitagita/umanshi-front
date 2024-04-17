@@ -20,12 +20,11 @@ export async function registerToSchedule(data: { calendarCode: string; nickname:
     const responseData = await response.json();
     //console.log(responseData);
 
-    var message = "팀원들과 일정조율 시작!";
-    if (responseData.status != 200) {
-      message = responseData.message;
+    if (responseData.status == 200) {
+      responseData.message = "팀원들과 일정조율 시작!";
     }
 
-    return message;
+    return responseData;
   } catch (error) {
     console.error('Error registering to calendar:', error);
     throw error;

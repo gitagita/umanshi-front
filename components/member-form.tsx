@@ -2,17 +2,25 @@
 
 import { registerToSchedule } from "@/utils/member-register";
 import { FormEvent, useState } from "react";
+import { useRouter } from 'next/navigation';
 
 export default function MemberForm({ id }: { id: string }) {
   const calendarCode = id;
   const [nickname, setNickname] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
-      const message = await registerToSchedule({ calendarCode, nickname });
-      alert(message);
+      const result = await registerToSchedule({ calendarCode, nickname });
+      alert(result.message);
+
+      const userId = result.data.userId;
+      if(userId) {
+        router.push(`/schedule/${userId}`);
+      }
+
       // Additional actions after successful registration
     } catch (error) {
       // Handle error, e.g., display error message
