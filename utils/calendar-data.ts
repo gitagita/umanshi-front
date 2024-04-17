@@ -28,12 +28,11 @@ const setCalendarData = async (calendarData: CalendarDataProps, calendarCode: st
     }
 
     const responseData = await response.json();
-    const resault = { message: "팀원들에게 링크를 공유하세요", data: responseData };
-    if (responseData.status != 200) {
-      resault.message = responseData.message;
+    if (responseData.status == 200) {
+      responseData.message = "팀원들에게 링크를 공유하세요";
     }
 
-    return resault;
+    return responseData;
   } catch (error) {
     console.error('Error registering to calendar:', error);
     throw error;

@@ -20,12 +20,11 @@ const setScheduleData = async (scheduleData: EventInput[], userId: string) => {
     }
 
     const responseData = await response.json();
-    const resault = { message: "일정이 저장되었습니다", data: responseData.data };
-    if (responseData.status != 200) {
-      resault.message = responseData.message;
+    if (responseData.status == 200) {
+      responseData.message = "일정이 저장되었습니다";
     }
 
-    return resault;
+    return responseData;
   } catch (error) {
     console.error('Error registering to calendar:', error);
     throw error;
