@@ -39,4 +39,11 @@ const getScheduleData = async(userId: string) => {
   return responseData;
 }
 
-export { setScheduleData, getScheduleData }
+// 사용자가 속한 캘린더 검사
+const checkUserCalendar = async(userId: string, calendarCode: string) => {
+  const response = await fetch(`${process.env.BACKEND_SERVER}/${API_SCHEDULE_DATA}/${userId}/check/${calendarCode}`);
+  const responseData = response.json();
+  return responseData;
+}
+
+export { setScheduleData, getScheduleData, checkUserCalendar }
