@@ -78,7 +78,7 @@ export default function ScheduleRange({ params: { id, calendarCode, dateList } }
   //일정 정보 저장 api 호출 함수
   const insertScheduleData = async () => {
     try {
-      const result = await setScheduleData(events, userId);
+      const result = await setScheduleData(events, userId, calendarCode);
       alert(result.message);
     } catch (error) {
       console.error('Error registering to calendar:', error);

@@ -2,7 +2,7 @@ import { API_SCHEDULE_DATA } from "@/app/constants";
 import { EventInput } from "@fullcalendar/core";
 
 //개인 일정 정보 저장
-const setScheduleData = async (scheduleData: EventInput[], userId: string) => {
+const setScheduleData = async (scheduleData: EventInput[], userId: string, calendarCode: string) => {
   try {
     const response = await fetch(`/api/${API_SCHEDULE_DATA}`, {
       method: 'POST',
@@ -11,7 +11,8 @@ const setScheduleData = async (scheduleData: EventInput[], userId: string) => {
       },
       body: JSON.stringify({
         dateList: JSON.stringify(scheduleData),
-        userId: userId
+        userId: userId,
+        calendarCode: calendarCode
       })
     })
 
