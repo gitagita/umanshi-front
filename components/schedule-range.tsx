@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { EventInput, EventClickArg, DateSelectArg } from "@fullcalendar/core";
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from "@fullcalendar/interaction";
@@ -20,11 +20,41 @@ interface CalendarDataParams {
     end: string
   }
 }
+interface DateListParams {
+  id: string,
+  date: string,
+  check: boolean
+}
 interface iParams { params: { id: string, calendarCode: string, dateList: CalendarDataParams } }
 
 export default function ScheduleRange({ params: { id, calendarCode, dateList } }: iParams) {
   const [events, setEvents] = useState<EventInput[]>([]);
   const userId: string = id;
+  const [eventList, setEventList] = useState<DateListParams[]>([]);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    listEvents();
+  }, []);
+
+  const listEvents = () => {
+    let cnt: number = 0;
+    dateList.events.map((e: EventInput) => {
+      var start = JSON.stringify(e.start);
+      var end = JSON.stringify(e.end);
+      var date = new Date(start);
+
+      var nextDay = { id: 'date' + cnt, date: e.start as string, check: false };
+
+      while (JSON.stringify(nextDay.date) < end) {
+        cnt++;
+        eventList.push(nextDay);
+        var next = new Date(date.setDate(date.getDate() + 1));
+        var nextDay = { id: 'date' + cnt, date: setDateFormat(next), check: false };
+      }
+    })
+    setVisible(true);
+  }
 
   const addEvents = (id: string, start: string, end: string) => {
     const newEvents: EventInput[] = [...events];
@@ -42,6 +72,22 @@ export default function ScheduleRange({ params: { id, calendarCode, dateList } }
   const handleEventClick = (clickInfo: EventClickArg) => {
     clickInfo.event.remove();
     removeEvent(clickInfo.event.id);
+
+    // 일정 체크 표시 제거
+    if (clickInfo.event.start) {
+      const cDate = setDateFormat(clickInfo.event.start);
+      eventList.map((el) => {
+        // console.log(cDate, ' ', el.date);
+        if (el.check && (el.date == cDate)) {
+          if (events.filter((e: EventInput) => {
+            return setDateFormat(new Date(e.start as Date)) == cDate;
+          }).length == 1) {
+            el.check = false;
+          }
+          return;
+        }
+      })
+    }
   };
 
   const createEventId = (): string => {
@@ -51,6 +97,14 @@ export default function ScheduleRange({ params: { id, calendarCode, dateList } }
   const handleDateSelect = (selectInfo: DateSelectArg) => {
     const eventId: string = createEventId();
     addEvents(eventId, selectInfo.startStr, selectInfo.endStr);
+
+    //일정 체크 표시
+    const sDate = setDateFormat(selectInfo.start);
+    eventList.map((el) => {
+      if (!el.check && (el.date == sDate)) {
+        el.check = true;
+      }
+    })
   }
 
   const setDateFormat = (date: Date) => {
@@ -88,6 +142,9 @@ export default function ScheduleRange({ params: { id, calendarCode, dateList } }
 
   return (
     <div>
+      {visible ? eventList.map(((event, index) => {
+        return <li key={index}>{event.date} {event.check ? '[✔️]' : '[가능 일정 설정 안함]'}</li>
+      })) : <></>}
       <button onClick={insertScheduleData}>결과 저장</button>
       <FullCalendar
         plugins={[timeGridPlugin, interactionPlugin]}
