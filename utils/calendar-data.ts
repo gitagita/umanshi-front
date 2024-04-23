@@ -1,4 +1,4 @@
-import { API_CALENDAR_DATA } from "@/app/constants";
+import { API_CALENDAR_DATA, API_CALENDAR_MERGE } from "@/app/constants";
 import { EventInput } from "@fullcalendar/core";
 
 interface CalendarDataProps {
@@ -46,4 +46,11 @@ const getCalendarData = async (calendarCode: string) => {
   return responseData;
 }
 
-export { setCalendarData, getCalendarData }
+// 캘린더에 속한 사용자 정보 조회
+const getCalendarMerge = async (calendarCode: string) => {
+  const response = await fetch(`${process.env.BACKEND_SERVER}/${API_CALENDAR_MERGE}/${calendarCode}`);
+  const responseData = response.json();
+  return responseData;
+}
+
+export { setCalendarData, getCalendarData, getCalendarMerge }
