@@ -1,4 +1,4 @@
-import CalendarMerge from "@/components/calendar_merge";
+import CalendarMerge from "@/components/calendar-merge";
 import { getCalendarMerge } from "@/utils/calendar-data";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
