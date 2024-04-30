@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EventInput, EventClickArg, DateSelectArg } from "@fullcalendar/core";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -14,15 +14,47 @@ import styles from "@/styles/calendar.module.css";
 interface SelectInfoParams {
   start: Date, end: Date, startStr: string, endStr: string
 }
+interface CalendarDataParams {
+  events: EventInput[],
+  times: {
+    start: string,
+    end: string
+  }
+  datetimes: {
+    start: Date,
+    end: Date
+  }
+}
+interface iParams { params: { id: string, dateList: CalendarDataParams } }
 
 let eventGuid: number = 0;
 
-export default function CalendarRange({ id }: { id: string }) {
+export default function CalendarRange({ params: { id, dateList } }: iParams) {
   const [events, setEvents] = useState<EventInput[]>([]);
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
   const [calendarCode, setCalendarCode] = useState<string>(id);
   const [visible, setVisible] = useState(false);
+
+
+  useEffect(() => {
+    setDateList();
+    setTimeData();
+  }, [])
+
+  const setDateList = () => {
+    if (dateList && dateList.events) {
+      setEvents(dateList.events);
+      setVisible(true);
+    }
+  }
+
+  const setTimeData = () => {
+    if (dateList && dateList.datetimes) {
+      setStartTime(dateList.datetimes.start);
+      setEndTime(dateList.datetimes.end);
+    }
+  }
 
   const filterPassedTime = (time: Date) => {
     const currentDate = new Date(startTime);
@@ -91,6 +123,10 @@ export default function CalendarRange({ id }: { id: string }) {
       times: {
         start: setTimeFormat(startTime),
         end: setTimeFormat(endTime)
+      },
+      datetimes: {
+        start: startTime,
+        end: endTime
       }
     }
 
@@ -130,7 +166,10 @@ export default function CalendarRange({ id }: { id: string }) {
         <button onClick={insertCalendarData}>결과 저장</button>
 
         {visible ?
-          <CalendarModal id={calendarCode} />
+          <div>
+            <CalendarModal id={calendarCode} />
+            <button onClick={insertCalendarData}>일정범위 수정</button>
+          </div>
           : <></>
         }
       </div>

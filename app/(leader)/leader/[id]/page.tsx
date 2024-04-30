@@ -1,11 +1,13 @@
-import CalendarRange from "@/components/calendar-range";
+import { Suspense } from "react";
+import CalendarData from "@/components/calendar-data";
 
 interface iParams { params: { id: string } }
-export default function CalendarRangePage({ params: { id } }: iParams) {
-
+export default async function CalendarRangePage({ params: { id } }: iParams) {
   return (
     <div>
-      <CalendarRange id={id} />
+      <Suspense fallback={<h1>Loading calendar info</h1>}>
+        <CalendarData params={{ id: id }} />
+      </Suspense>
     </div>
   );
 }

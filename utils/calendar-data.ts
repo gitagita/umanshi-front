@@ -1,4 +1,4 @@
-import { API_CALENDAR_DATA } from "@/app/constants";
+import { API_CALENDAR_DATA, API_CALENDAR_MERGE } from "@/app/constants";
 import { EventInput } from "@fullcalendar/core";
 
 interface CalendarDataProps {
@@ -28,12 +28,11 @@ const setCalendarData = async (calendarData: CalendarDataProps, calendarCode: st
     }
 
     const responseData = await response.json();
-    const resault = { message: "팀원들에게 링크를 공유하세요", data: responseData };
-    if (responseData.status != 200) {
-      resault.message = responseData.message;
+    if (responseData.status == 200) {
+      responseData.message = "팀원들에게 링크를 공유하세요";
     }
 
-    return resault;
+    return responseData;
   } catch (error) {
     console.error('Error registering to calendar:', error);
     throw error;
@@ -47,4 +46,11 @@ const getCalendarData = async (calendarCode: string) => {
   return responseData;
 }
 
-export { setCalendarData, getCalendarData }
+// 캘린더에 속한 사용자 정보 조회
+const getCalendarMerge = async (calendarCode: string) => {
+  const response = await fetch(`${process.env.BACKEND_SERVER}/${API_CALENDAR_MERGE}/${calendarCode}`);
+  const responseData = response.json();
+  return responseData;
+}
+
+export { setCalendarData, getCalendarData, getCalendarMerge }

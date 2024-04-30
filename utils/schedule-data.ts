@@ -2,7 +2,7 @@ import { API_SCHEDULE_DATA } from "@/app/constants";
 import { EventInput } from "@fullcalendar/core";
 
 //개인 일정 정보 저장
-const setScheduleData = async (scheduleData: EventInput[], userId: string) => {
+const setScheduleData = async (scheduleData: EventInput[], userId: string, calendarCode: string) => {
   try {
     const response = await fetch(`/api/${API_SCHEDULE_DATA}`, {
       method: 'POST',
@@ -11,7 +11,8 @@ const setScheduleData = async (scheduleData: EventInput[], userId: string) => {
       },
       body: JSON.stringify({
         dateList: JSON.stringify(scheduleData),
-        userId: userId
+        userId: userId,
+        calendarCode: calendarCode
       })
     })
 
@@ -20,12 +21,11 @@ const setScheduleData = async (scheduleData: EventInput[], userId: string) => {
     }
 
     const responseData = await response.json();
-    const resault = { message: "일정이 저장되었습니다", data: responseData.data };
-    if (responseData.status != 200) {
-      resault.message = responseData.message;
+    if (responseData.status == 200) {
+      responseData.message = "일정이 저장되었습니다";
     }
 
-    return resault;
+    return responseData;
   } catch (error) {
     console.error('Error registering to calendar:', error);
     throw error;
@@ -39,4 +39,11 @@ const getScheduleData = async(userId: string) => {
   return responseData;
 }
 
-export { setScheduleData, getScheduleData }
+// 사용자가 속한 캘린더 검사
+const checkUserCalendar = async(userId: string, calendarCode: string) => {
+  const response = await fetch(`${process.env.BACKEND_SERVER}/${API_SCHEDULE_DATA}/${userId}/check/${calendarCode}`);
+  const responseData = response.json();
+  return responseData;
+}
+
+export { setScheduleData, getScheduleData, checkUserCalendar }

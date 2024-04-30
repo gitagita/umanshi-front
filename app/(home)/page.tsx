@@ -18,9 +18,6 @@ export default function HomePage() {
         <li>
           <Link href="/leader">CREATE 리더가 캘린더 만들기</Link>
         </li>
-        <li>
-          <Link href="/member">JOIN 캘린더 참여</Link>
-        </li>
       </ul>
       {
         userInfo.userId != ''

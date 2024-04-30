@@ -9,7 +9,7 @@ export default async function ScheduleData({ params: { id, calendarCode } }: iPa
 
   return (
     <div>
-      <ScheduleRange params={{ id: id, calendarCode: calendarCode, dateList: calendar.data.date_list}} />
+      <ScheduleRange params={{ id: id, calendarCode: calendarCode, dateList: calendar.data.dateList}} />
     </div>
   );
 }
