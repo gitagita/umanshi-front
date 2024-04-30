@@ -17,7 +17,7 @@ export default async function SchedulePage({ params: { id } }: iParams) {
 
   return (
     <div>
-      <h1>일정을 설정하세요.</h1>
+      <h1>가능한 시간을 설정하세요.</h1>
       <Suspense fallback={<h1>Loading calendar info</h1>}>
         <ScheduleData params={{ id: id, calendarCode: userInfo.calendarCode }} />
       </Suspense>
