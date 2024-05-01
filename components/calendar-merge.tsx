@@ -8,23 +8,48 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from "@fullcalendar/interaction";
 import styles from "@/styles/calendar.module.css";
 import { timeToNum, numToTime } from "@/data/imos-format";
+import Modal from 'react-modal';
 
+Modal.setAppElement('body');
+
+const customStyles = {
+  overlay: {
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 10
+  },
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)'
+  }
+};
 interface UserListParams {
   userId: number,
   userNm: string,
   dateList: string,
   isLeader: number
 }
+interface userInfo {
+  userId: string,
+  userNm: string
+}
 interface eventsType {
   start: string,
   end: string,
-  title: string
+  title: string,
+  user: userInfo[]
 }
 interface iParams { params: { id: string, userList: UserListParams[] } }
+
 export default function CalendarMerge({ params: { id, userList } }: iParams) {
   const [events, setEvents] = useState<EventInput[]>([]);
   const [visible, setVisible] = useState(false);
-  const [mergeEvents, setmergeEvents] = useState<eventsType[]>([]);
+  const [mergeEvents, setMergeEvents] = useState<eventsType[]>([]);
+  const [userVisible, setUserVisible] = useState(false);
+  const [user, setUser] = useState<userInfo[]>([]);
 
   useEffect(() => {
     setUserList();
@@ -32,7 +57,6 @@ export default function CalendarMerge({ params: { id, userList } }: iParams) {
 
   const setUserList = () => {
     userList.map((ul) => {
-      // console.log(ul);
       if (ul.dateList) {
         var dateList = JSON.parse(ul.dateList);
 
@@ -40,7 +64,8 @@ export default function CalendarMerge({ params: { id, userList } }: iParams) {
           var id = date.id;
           var start = date.start;
           var end = date.end;
-          events.push({ id, start, end });
+          var userInfo = { userId: ul.userId, userNm: ul.userNm }
+          events.push({ id, start, end, userInfo });
         })
       }
     })
@@ -51,12 +76,15 @@ export default function CalendarMerge({ params: { id, userList } }: iParams) {
     var TIME_RANGE = 48;
     var imos: number[] = Array.from({ length: TIME_RANGE }, () => 0);
     var tmpDate: string;
+    var user: userInfo[] = [];
+
     events.map((e, index) => {
       var start = new Date(e.start as string);
       var end = new Date(e.end as string);
       var startDate = setDateFormat(start, 0);
       var startTime = setTimeFormat(start);
       var endTime = setTimeFormat(end);
+      user.push(e.userInfo);
 
       if (tmpDate != undefined && ((tmpDate != startDate && imos.length > 0) || index === events.length - 1)) {
         if (index === events.length - 1) {  //마지막 이벤트에 대한 일정 처리
@@ -79,14 +107,15 @@ export default function CalendarMerge({ params: { id, userList } }: iParams) {
             var start = tmpDate + 'T' + numToTime[tmpIndex] + '+09:00';
             var end = tmpEndDate + 'T' + numToTime[index] + '+09:00';
             var title = count + " 명";
-            mergeEvents.push({ start, end, title });
+            mergeEvents.push({ start, end, title, user });
           }
           if (count != im) {
             tmpIndex = index;
           }
           count = im;
         })
-        imos = Array.from({ length: TIME_RANGE }, () => 0);
+        imos = Array.from({ length: TIME_RANGE }, () => 0); //imos 배열 초기화
+        user = [];  //user 정보 초기화
       }
 
       imos[timeToNum[startTime]] += 1;
@@ -94,7 +123,7 @@ export default function CalendarMerge({ params: { id, userList } }: iParams) {
 
       tmpDate = startDate;
     })
-
+    
     setVisible(true);
   }
 
@@ -113,6 +142,16 @@ export default function CalendarMerge({ params: { id, userList } }: iParams) {
     return years + '-' + month + '-' + day;
   }
 
+  const openUserList = (eventInfo: EventInput) => {
+    setUser(eventInfo.event.extendedProps.user);
+    setUserVisible(true);
+  }
+
+  const closeUserList = () => {
+    setUser([]);
+    setUserVisible(false);
+  }
+
   return (
     <div>
       {visible ? <div className={styles.calendarContainer}>
@@ -126,12 +165,32 @@ export default function CalendarMerge({ params: { id, userList } }: iParams) {
           }}
           events={mergeEvents}
           dayMaxEventRows={true}
-        // selectable={true}
-        // eventClick={handleEventClick}
+          // eventMouseEnter={openUserList}
+          // eventMouseLeave={closeUserList}
+          // selectable={true}
+          eventClick={openUserList}
         // select={handleDateSelect}
         // selectAllow={handleSelectAllow}
         />
       </div> : <></>}
+
+      <div>
+        <Modal
+          isOpen={userVisible}
+          onRequestClose={closeUserList}
+          style={customStyles}
+        >
+          <div>
+            <h3>가능한 사람들</h3>
+            <button onClick={closeUserList}>닫기</button>
+            <form>
+              {user.map(((u, index) => {
+                return <li key={index}>{u.userNm}</li>
+              }))}
+            </form>
+          </div>
+        </Modal>
+      </div>
 
     </div>
   );
