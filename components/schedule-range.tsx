@@ -48,6 +48,8 @@ export default function ScheduleRange({ params: { id, calendarCode, dateList, sc
   const listEvents = () => {
     let cnt: number = 0;
     if (dateList && dateList.events) {
+      eventGuid = dateList.events.length; //event id
+
       dateList.events.map((e: EventInput) => {
         var start = JSON.stringify(e.start);
         var end = JSON.stringify(e.end);
