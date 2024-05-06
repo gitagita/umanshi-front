@@ -12,7 +12,6 @@ let eventGuid: number = 0;
 interface SelectInfoParams {
   start: Date, end: Date, startStr: string, endStr: string
 }
-
 interface CalendarDataParams {
   events: EventInput[],
   times: {
@@ -25,35 +24,73 @@ interface DateListParams {
   date: string,
   check: boolean
 }
-interface iParams { params: { id: string, calendarCode: string, dateList: CalendarDataParams } }
+interface ScheduleParams {
+  userNm: string,
+  dateList: string
+}
+interface iParams { params: { id: string, calendarCode: string, dateList: CalendarDataParams, scheduleList: ScheduleParams } }
 
-export default function ScheduleRange({ params: { id, calendarCode, dateList } }: iParams) {
+export default function ScheduleRange({ params: { id, calendarCode, dateList, scheduleList } }: iParams) {
   const [events, setEvents] = useState<EventInput[]>([]);
   const userId: string = id;
   const [eventList, setEventList] = useState<DateListParams[]>([]);
+  const [businessStart, setBusinessStart] = useState<string>();
+  const [businessEnd, setBusinessEnd] = useState<string>();
   const [visible, setVisible] = useState(false);
+  const [scheduleVisible, setScheduleVisible] = useState(false);
 
   useEffect(() => {
     listEvents();
+    listSchedules();
+    setTimeData();
   }, []);
 
   const listEvents = () => {
     let cnt: number = 0;
-    dateList.events.map((e: EventInput) => {
-      var start = JSON.stringify(e.start);
-      var end = JSON.stringify(e.end);
-      var date = new Date(start);
+    if (dateList && dateList.events) {
+      eventGuid = dateList.events.length; //event id
 
-      var nextDay = { id: 'date' + cnt, date: e.start as string, check: false };
+      dateList.events.map((e: EventInput) => {
+        var start = JSON.stringify(e.start);
+        var end = JSON.stringify(e.end);
+        var date = new Date(start);
 
-      while (JSON.stringify(nextDay.date) < end) {
-        cnt++;
-        eventList.push(nextDay);
-        var next = new Date(date.setDate(date.getDate() + 1));
-        var nextDay = { id: 'date' + cnt, date: setDateFormat(next), check: false };
-      }
-    })
+        var nextDay = { id: 'date' + cnt, date: e.start as string, check: false };
+
+        while (JSON.stringify(nextDay.date) < end) {
+          cnt++;
+          eventList.push(nextDay);
+          var next = new Date(date.setDate(date.getDate() + 1));
+          var nextDay = { id: 'date' + cnt, date: setDateFormat(next), check: false };
+        }
+      })
+    }
     setVisible(true);
+  }
+
+  const listSchedules = () => {
+    console.log(JSON.parse(scheduleList.dateList));
+    if (scheduleList && scheduleList.dateList) {
+      const schedule = JSON.parse(scheduleList.dateList);
+      setEvents(schedule);
+
+      //일정 체크 표시
+      schedule.map((s:EventInput)=> {
+        eventList.map((el) => {
+          if (!el.check && (el.date == setDateFormat(new Date(s.start as string)))) {
+            el.check = true;
+          }
+        })
+      })
+    }
+    setScheduleVisible(true);
+  }
+
+  const setTimeData = () => {
+    if (dateList && dateList.times) {
+      setBusinessStart(dateList.times.start);
+      setBusinessEnd(dateList.times.end);
+    }
   }
 
   const addEvents = (id: string, start: string, end: string) => {
@@ -145,28 +182,32 @@ export default function ScheduleRange({ params: { id, calendarCode, dateList } }
       {visible ? eventList.map(((event, index) => {
         return <li key={index}>{event.date} {event.check ? '[✔️]' : '[가능 일정 설정 안함]'}</li>
       })) : <></>}
-      <button onClick={insertScheduleData}>결과 저장</button>
-      <FullCalendar
-        plugins={[timeGridPlugin, interactionPlugin]}
-        initialView='timeGridWeek'
-        selectable={true}
-        events={events}
-        eventClick={handleEventClick}
-        select={handleDateSelect}
-        selectAllow={handleSelectAllow}
-        headerToolbar={{
-          left: 'prev,next',
-          center: 'title',
-          right: 'timeGridWeek,timeGridDay' // user can switch between the two
-        }}
-        businessHours={{
-          daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
-          startTime: dateList.times.start,
-          endTime: dateList.times.end
-        }}
-        selectConstraint='businessHours'
-        nowIndicator={true}
-      />
+      {scheduleVisible ?
+        <div>
+          <button onClick={insertScheduleData}>결과 저장</button>
+          <FullCalendar
+            plugins={[timeGridPlugin, interactionPlugin]}
+            initialView='timeGridWeek'
+            selectable={true}
+            events={events}
+            eventClick={handleEventClick}
+            select={handleDateSelect}
+            selectAllow={handleSelectAllow}
+            headerToolbar={{
+              left: 'prev,next',
+              center: 'title',
+              right: 'timeGridWeek,timeGridDay' // user can switch between the two
+            }}
+            businessHours={{
+              daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+              startTime: businessStart,
+              endTime: businessEnd
+            }}
+            selectConstraint='businessHours'
+            nowIndicator={true}
+          />
+        </div>
+        : <></>}
     </div>
   );
 }

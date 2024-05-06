@@ -33,8 +33,8 @@ const setScheduleData = async (scheduleData: EventInput[], userId: string, calen
 }
 
 //개인 일정 데이터 조회
-const getScheduleData = async(userId: string) => {
-  const response = await fetch(`${process.env.BACKEND_SERVER}/${API_SCHEDULE_DATA}/${userId}`);
+const getScheduleData = async(userId: string, calendarCode: string) => {
+  const response = await fetch(`${process.env.BACKEND_SERVER}/${API_SCHEDULE_DATA}/${userId}/${calendarCode}`);
   const responseData = response.json();
   return responseData;
 }
